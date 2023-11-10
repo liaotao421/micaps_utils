@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 from PIL import Image
-import micaps_data_io as micaps_data_io
+from .micaps_data_io import read_micaps_11
 
 
 # 计算风速speed和风向Direction
@@ -89,7 +89,7 @@ def compute_rbg(speed, direction, only_r=False):
 
 # 产生图片
 def generate_image(filepath, image_size):
-    stacked_array, lon_range, lat_range = micaps_data_io.read_micaps_11(filepath)
+    stacked_array, lon_range, lat_range = read_micaps_11(filepath)
     resized_array = cv2.resize(stacked_array, image_size)
     speed, direction = compute_speed_and_direction(resized_array)
     image = compute_rbg(speed, direction)
@@ -98,7 +98,7 @@ def generate_image(filepath, image_size):
 
 # 只产生R通道的图片（表示风速大小）
 def generate_image_only_r(filepath, image_size):
-    stacked_array, lon_range, lat_range = micaps_data_io.read_micaps_11(filepath)
+    stacked_array, lon_range, lat_range = read_micaps_11(filepath)
     resized_array = cv2.resize(stacked_array, image_size)
     speed, direction = compute_speed_and_direction(resized_array)
     image = compute_rbg(speed, direction, only_r=True)
