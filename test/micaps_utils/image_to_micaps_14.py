@@ -3,7 +3,6 @@ import cv2
 from skimage import morphology
 import numpy as np
 from sklearn.cluster import DBSCAN
-from PIL import Image
 
 
 # 骨架提取
@@ -14,12 +13,14 @@ def skeleton(image):
 
 # 得到图片中白色的点
 def get_white_points(image):
+    # 转换图像为灰度
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
     # 先来个反转
-    gray_image = image[::-1, :]
+    gray_image = gray_image[::-1, :]
 
     # 设置白色像素的阈值
-    threshold = 144
+    threshold = 200
 
     # 找到白色像素的坐标
     white_pixel_coordinates = np.argwhere(gray_image > threshold)
@@ -101,15 +102,9 @@ def write_to_micaps14(clustered_points, file_path):
 
 
 def generate_micaps14_file(image_path, file_path):
-    image = cv2.imread(image_path, 0)
+    image = cv2.imread(image_path)
     image = skeleton(image)
     white_pixel_coordinates = get_white_points(image)
     clustered_points = dbscan_points(white_pixel_coordinates)
-    write_to_micaps14(clustered_points, file_path)
+    white_pixel_coordinates(clustered_points, file_path)
 
-
-# test
-# image = cv2.imread('../sample_data/network_output/19010508.png', 0)
-# image = skeleton(image)
-# image = Image.fromarray(image)
-# image.show()
