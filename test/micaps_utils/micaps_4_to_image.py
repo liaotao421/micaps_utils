@@ -1,7 +1,7 @@
 # micaps4转化为图片
 
 import cv2
-from micaps_data_io import read_micaps_4
+from .micaps_data_io import read_micaps_4
 import numpy as np
 from PIL import Image
 

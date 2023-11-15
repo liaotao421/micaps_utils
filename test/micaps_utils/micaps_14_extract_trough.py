@@ -10,7 +10,7 @@ def file_change(src_file, target_file):
     # 提取表示槽线的内容为 content_after_line
     start_index = None
     for i, line in enumerate(lines):
-        if "simhei.ttf" in line:
+        if "WithProp_LINESYMBOLS" in line:
             start_index = i + 1
             break
 
@@ -21,11 +21,13 @@ def file_change(src_file, target_file):
     else:
         print("未找到指定行")
 
-    line_list = content_after_line.split('\n')
-    total_line = line_list[0][-1]
 
     pattern = re.compile(r'0 4 255 165 42 42 0 0(.*?)NoLabel 0', re.DOTALL)
     matches = pattern.findall(content_after_line)
+
+    if len(matches) == 0:
+        pattern = re.compile(r'0 4 255 255 255 0 0 0(.*?)NoLabel 0', re.DOTALL)
+        matches = pattern.findall(content_after_line)
 
     data = []
     # 输出匹配到的内容

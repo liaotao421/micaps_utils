@@ -25,6 +25,10 @@ def file_change(src_file, target_file):
     pattern = re.compile(r'0 4 255 165 42 42 0 0(.*?)NoLabel 0', re.DOTALL)
     matches = pattern.findall(content_after_line)
 
+    if len(matches) == 0:
+        pattern = re.compile(r'0 4 255 255 255 0 0 0(.*?)NoLabel 0', re.DOTALL)
+        matches = pattern.findall(content_after_line)
+
     data = []
     # 输出匹配到的内容
     for match in matches:
