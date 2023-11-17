@@ -75,13 +75,50 @@ def write_to_micaps14(clustered_points, file_path):
             p = (x, y)
             x_y_points.append(p)
 
-        sorted_points = sorted(x_y_points, key=lambda x_y_points: (x_y_points[0], x_y_points[1]))
+        # 排序不行，还是得连通域这方向考虑
+
+        points_num = len(x_y_points)
+
+        start_point = ()
+
+        for point in x_y_points:
+            x, y = point
+            neighbor_num = 0
+            eight_neighbor = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1),
+                              (x, y + 1), (x + 1, y + 1)]
+            for p in x_y_points:
+                if p in eight_neighbor:
+                    neighbor_num += 1
+            if neighbor_num == 1:
+                start_point = point
+
+        # 找到起点/终点
+        points_sorted = []
+        points_sorted.append(start_point)
+
+        x_y_points.remove(start_point)
+
+        while len(points_sorted) < points_num:
+
+            x, y = start_point
+            eight_neighbor = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1),
+                              (x, y + 1),
+                              (x + 1, y + 1)]
+
+            for point in x_y_points:
+                if point in eight_neighbor:
+                    points_sorted.append(point)
+                    start_point = point
+                    x_y_points.remove(point)
+
+
+
 
         file.writelines(f'0 4 {len(points)}\n')
         index = 0
-        for i in range(0, len(sorted_points), 1):
+        for i in range(0, len(points_sorted), 1):
             index += 1
-            x, y = sorted_points[i]
+            x, y = points_sorted[i]
             x = x / 3.2
             y = (68 * y + 3840) / 320
             file.write("{:10.3f}{:10.3f}     0.000".format(x, y))
@@ -107,14 +144,48 @@ def write_to_micaps14(clustered_points, file_path):
             p = (x, y)
             x_y_points.append(p)
 
-        sorted_points = sorted(x_y_points, key=lambda x_y_points: (x_y_points[0], x_y_points[1]))
+        # 排序不行，还是得连通域这方向考虑
+
+        points_num = len(x_y_points)
+
+        start_point = ()
+
+        for point in x_y_points:
+            x, y = point
+            neighbor_num = 0
+            eight_neighbor = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1),
+                              (x, y + 1), (x + 1, y + 1)]
+            for p in x_y_points:
+                if p in eight_neighbor:
+                    neighbor_num += 1
+            if neighbor_num == 1:
+                start_point = point
+
+        # 找到起点/终点
+        points_sorted = []
+        points_sorted.append(start_point)
+
+        x_y_points.remove(start_point)
+
+        while len(points_sorted) < points_num:
+
+            x, y = start_point
+            eight_neighbor = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1),
+                              (x, y + 1),
+                              (x + 1, y + 1)]
+
+            for point in x_y_points:
+                if point in eight_neighbor:
+                    points_sorted.append(point)
+                    start_point = point
+                    x_y_points.remove(point)
 
         file.writelines(f'0 4 255 165 42 42 0 0\n')
         file.writelines(f'{len(points)}\n')
         index = 0
-        for i in range(0, len(sorted_points), 1):
+        for i in range(0, len(points_sorted), 1):
             index += 1
-            x, y = sorted_points[i]
+            x, y = points_sorted[i]
             x = x / 3.2
             y = (68 * y + 3840) / 320
             file.write("{:10.3f}{:10.3f}     0.000".format(x, y))
