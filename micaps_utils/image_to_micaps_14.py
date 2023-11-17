@@ -70,8 +70,8 @@ def write_to_micaps14(clustered_points, file_path):
         # 要对点就行排序
         x_y_points = []
         for point in points:
-            x = point[1]
-            y = point[0]
+            x = point[0]
+            y = point[1]
             p = (x, y)
             x_y_points.append(p)
 
@@ -82,8 +82,8 @@ def write_to_micaps14(clustered_points, file_path):
         for i in range(0, len(sorted_points), 1):
             index += 1
             x, y = sorted_points[i]
-            x = (68 * x + 3840) / 320
-            y = y / 3.2
+            x = x / 3.2
+            y = (68 * y + 3840) / 320
             file.write("{:10.3f}{:10.3f}     0.000".format(x, y))
             if index % 4 == 0:
                 file.write('\n')
@@ -115,8 +115,8 @@ def write_to_micaps14(clustered_points, file_path):
         for i in range(0, len(sorted_points), 1):
             index += 1
             x, y = sorted_points[i]
-            x = (68 * x + 3840) / 320
-            y = y / 3.2
+            x = x / 3.2
+            y = (68 * y + 3840) / 320
             file.write("{:10.3f}{:10.3f}     0.000".format(x, y))
             if index % 4 == 0:
                 file.write('\n')
