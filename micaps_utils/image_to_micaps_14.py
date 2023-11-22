@@ -30,6 +30,7 @@ def get_white_points(image):
 
 # 对点做DBSCAN聚类
 def dbscan_points(white_pixel_coordinates, eps=3, min_samples=5):
+    global new_line, temp_points
     dbscan = DBSCAN(eps=eps, min_samples=min_samples)  # 调整eps和min_samples
     dbscan.fit(white_pixel_coordinates)
 
@@ -37,22 +38,88 @@ def dbscan_points(white_pixel_coordinates, eps=3, min_samples=5):
     labels = dbscan.labels_
 
     # 创建一个字典，将点按照聚类标签分类
-
     clustered_points = {}
-
+    pop_flag = 0
     for i, label in enumerate(labels):
         if label in clustered_points:
             clustered_points[label].append(white_pixel_coordinates[i])
         else:
             clustered_points[label] = [white_pixel_coordinates[i]]
 
+    # 聚类后若有分叉要分为两条线
+    # 找到有三个端点的线
+    for label, pointss in clustered_points.items():
+        points = []
+        for point in pointss:
+            x = point[0]
+            y = point[1]
+            p = (x, y)
+            points.append(p)
+
+        eight_neighbor_3 = []
+        start_point = (0, 0)
+        for point in points:
+            x, y = point
+            neighbor_num = 0
+            eight_neighbor = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1),
+                              (x, y + 1), (x + 1, y + 1)]
+            for p in points:
+                if p in eight_neighbor:
+                    neighbor_num += 1
+            if neighbor_num == 4:
+                start_point = point
+            if neighbor_num == 3:
+                eight_neighbor_3.append(point)
+
+        if len(eight_neighbor_3) == 0:
+            continue
+
+        # 找到下一个点
+        x, y = start_point
+        eight_neighbor = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1),
+                          (x, y + 1),
+                          (x + 1, y + 1)]
+        next_point = (0, 0)
+        for point in points:
+            if point in eight_neighbor and point not in eight_neighbor_3:
+                next_point = point
+
+        # 另起一条线
+        new_line = [start_point, next_point]
+        points.remove(start_point)
+        points.remove(next_point)
+
+        while True:
+            x, y = next_point
+            neighbor_num = 0
+            eight_neighbor = [(x - 1, y - 1), (x, y - 1), (x + 1, y - 1), (x - 1, y), (x + 1, y), (x - 1, y + 1),
+                              (x, y + 1),
+                              (x + 1, y + 1)]
+            for p in points:
+                if p in eight_neighbor:
+                    neighbor_num += 1
+            # 找到终点了
+            if neighbor_num == 0:
+                break
+            for point in points:
+                if point in eight_neighbor:
+                    new_line.append(point)
+                    next_point = point
+                    points.remove(point)
+
+        #
+        pop_flag = label
+        temp_points = points
+    clustered_points.pop(pop_flag)
+
+    clustered_points[67373] = [list(t) for t in new_line]
+    clustered_points[67374] = [list(t) for t in temp_points]
+
     return clustered_points
 
 
 def write_to_micaps14(clustered_points, file_path):
     file = open(file_path, 'w')
-
-
     file_name = os.path.basename(file_path)
 
     year, month, day = '20' + file_name[0:2], file_name[2:4], file_name[4:6]
@@ -66,7 +133,6 @@ def write_to_micaps14(clustered_points, file_path):
 
     for label, points in clustered_points.items():
         # points = points[::5]
-
         # 要对点就行排序
         x_y_points = []
         for point in points:
